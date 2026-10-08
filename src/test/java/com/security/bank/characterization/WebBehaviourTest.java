@@ -113,6 +113,14 @@ class WebBehaviourTest extends IntegrationTestBase {
     }
 
     @Test
+    void trailingSlashOnPublicEndpointsIsNotPublic() {
+	customer("alice");
+	assertEmptyForbidden(post("/user/login/", null, Map.of("username", "alice", "password", PASSWORD)));
+	assertEmptyForbidden(post("/user/register/", null, userBody("bob")));
+	assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM user", Integer.class)).isEqualTo(1);
+    }
+
+    @Test
     void trailingSlashMatchesTheSameHandler() {
 	Session s = customer("alice");
 	AccountRef a = openAccount(s, "SAVINGS", 100);
